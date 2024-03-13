@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 import requests
     
@@ -6,6 +7,8 @@ class ZackCrawler:
     
     def __init__(self) -> None:
         self.base_url_earnings = """https://www.zacks.com/stock/research/{}/earnings-headlines?icid=quote-stock_overview-quote_nav_tracking-zcom-left_subnav_quote_navbar-earning_news"""
+        self.base_url = "https://www.zacks.com"
+
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107 Safari/537.36'
         }
@@ -33,10 +36,15 @@ class ZackCrawler:
                 li_elements = ul.find_all('li')
                 for li in li_elements:
                     a_tag = li.find('a')
-                    if a_tag:
-                        url = a_tag.get('href')
-                        print(f"Found URL: {url}")
-                        urls.append(url)
+                    if a_tag:                                                
+                        url = a_tag.get('href')    
+                        if url.startswith('/research/get_news.php'):
+                            full_url = urljoin(self.base_url, f"{url}&art_rec=quote-quote-earnings_news-ID02-txt")
+                        else:
+                            full_url = urljoin(self.base_url, url)                        
+                        
+                        print(f"Found URL: {full_url}")
+                        urls.append(full_url)
 
         return urls
         
