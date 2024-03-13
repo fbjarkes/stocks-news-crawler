@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "stock-catalyst-news-crawler"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = ""
+readme = "README.md"
+packages = [{include = "stock_catalyst_news_crawler"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+newspaper4k = "^0.9.2"
+bs4 = "^0.0.2"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
