@@ -1,7 +1,14 @@
+import sys
+sys.path.insert(0, '/Users/fbjarkes/git/python/stock-catalyst-news-crawler') # so we can run this file
+
+import json
+import time
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 import requests
-    
+import newspaper
+
+from link_parsers import newspaper_parser
 
 class ZackCrawler:
     
@@ -52,8 +59,13 @@ class ZackCrawler:
 
 if __name__ == "__main__":
     zc = ZackCrawler()
+    ticker = 'JOBY'
+     
     
-    
-    urls = zc.earnings_extract(zc.earnings_crawler('JOBY'))
-    print(urls)
+    urls = zc.earnings_extract(zc.earnings_crawler(ticker))
+    newspaper_parser.parse('zacks', ticker, urls)
+
+
+        
+
     print("Done")

@@ -11,7 +11,7 @@ import newspaper
 def validate_article_date(art: newspaper.Article, valid_date: str):
     if art.publish_date is not None:
         raise ValueError("Article publish_date is None")
-    if not str(art.publish_date).startswith(valid_date):
+    if valid_date and not str(art.publish_date).startswith(valid_date):
         raise ValueError(f"Article publish_date {art.publish_date} does not match valid_date {valid_date}")
     
 
