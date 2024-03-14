@@ -40,10 +40,9 @@ def parse(repository: NewsTextRepository, crawler: str, ticker: str, urls: List[
         except Exception as e:
             print(f"Failed to parse URL: {e} ({url})")
             continue
-          
-        # format date like '2023-02-22'
+        
         date = f"{article.publish_date}"        
-        data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title, 'crawler': crawler}
+        data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title, 'crawler': crawler}        
         
         repository.persist(data)
         

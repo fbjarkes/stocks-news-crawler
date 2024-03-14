@@ -19,7 +19,7 @@ class JsonFileRepository(NewsTextRepository):
         date = data['date'].split(' ')[0]
         outfile = f"{data['symbol']}_{date}_{data['crawler']}_{title}.json"
         with open(outfile, 'w') as f:
-            json.dump(data['text'], f, indent=4)
+            json.dump(data, f, indent=4)
         print(f"Wrote file '{outfile}'")
 
 
