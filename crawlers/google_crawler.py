@@ -7,7 +7,7 @@ import requests
 import re
 import mechanicalsoup
 
-from link_parsers import newspaper_parser
+from parsers import newspaper_parser
 
 
 

@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 import newspaper
 
-from link_parsers import newspaper_parser
+from parsers import newspaper_parser
 
 class ZackCrawler:
     
