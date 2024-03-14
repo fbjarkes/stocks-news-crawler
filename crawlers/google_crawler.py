@@ -36,6 +36,7 @@ def google_search(query):
     return urls
 
 if __name__ == "__main__":
-    query = "BAND Bandwidth Inc 2022-11-02"
+    #query = "BAND Bandwidth Inc 2022-11-02"
+    query = "Nutanix inc (NTNX) 2023-05-25"
     urls = google_search(query)
-    newspaper_parser.parse('google', 'BAND', urls, valid_date='2022-11-02')
+    newspaper_parser.parse('google', 'NTNX', urls, valid_date='2023-05-25')

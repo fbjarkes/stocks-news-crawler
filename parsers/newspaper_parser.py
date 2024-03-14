@@ -9,9 +9,13 @@ import newspaper
 
 
 def validate_article_date(art: newspaper.Article, valid_date: str):
-    if art.publish_date is not None:
+    if not valid_date:
+        return True
+    if art.publish_date is None:
         raise ValueError("Article publish_date is None")
-    if valid_date and not str(art.publish_date).startswith(valid_date):
+    date = f"{art.publish_date}"
+    date = date.split(' ')[0]
+    if date != valid_date:
         raise ValueError(f"Article publish_date {art.publish_date} does not match valid_date {valid_date}")
     
 
@@ -26,7 +30,7 @@ def parse(parser: str, ticker: str, urls: List[str], valid_date=''):
         print(f"Processing URL: {url}")
         
         try: 
-            article = newspaper.article(url)  
+            article = newspaper.article(url)
             validate_article_date(article, valid_date)      
             validate_article_text(article)
         except ValueError as e:
