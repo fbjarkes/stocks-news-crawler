@@ -6,7 +6,7 @@ from typing import List
 
 import newspaper
 
-from utils.persistence import PersistenceStrategy
+from utils.persistence import NewsTextRepository
 
 
 def validate_article_date(art: newspaper.Article, valid_date: str):
@@ -25,7 +25,7 @@ def validate_article_text(art: newspaper.Article):
         raise ValueError("Article text is None")
 
 
-def parse(repository: PersistenceStrategy, parser: str, ticker: str, urls: List[str], valid_date=''):
+def parse(repository: NewsTextRepository, crawler: str, ticker: str, urls: List[str], valid_date=''):
     for url in urls:
         print('='*80)
         print(f"Processing URL: {url}")
@@ -40,11 +40,10 @@ def parse(repository: PersistenceStrategy, parser: str, ticker: str, urls: List[
         except Exception as e:
             print(f"Failed to parse URL: {e} ({url})")
             continue
-        
-  
+          
         # format date like '2023-02-22'
         date = f"{article.publish_date}"        
-        data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title}
+        data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title, 'crawler': crawler}
         
         repository.persist(data)
         
