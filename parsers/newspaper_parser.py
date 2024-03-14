@@ -1,11 +1,12 @@
 
 
 
-import json
 import time
 from typing import List
 
 import newspaper
+
+from utils.persistence import PersistenceStrategy
 
 
 def validate_article_date(art: newspaper.Article, valid_date: str):
@@ -24,14 +25,14 @@ def validate_article_text(art: newspaper.Article):
         raise ValueError("Article text is None")
 
 
-def parse(parser: str, ticker: str, urls: List[str], valid_date=''):
+def parse(repository: PersistenceStrategy, parser: str, ticker: str, urls: List[str], valid_date=''):
     for url in urls:
         print('='*80)
         print(f"Processing URL: {url}")
         
         try: 
             article = newspaper.article(url)
-            validate_article_date(article, valid_date)      
+            validate_article_date(article, valid_date)    
             validate_article_text(article)
         except ValueError as e:
             print(f"Invalid article: {e} ({url})")
@@ -40,18 +41,12 @@ def parse(parser: str, ticker: str, urls: List[str], valid_date=''):
             print(f"Failed to parse URL: {e} ({url})")
             continue
         
-        # abbreviate title, max 20 characters and file system friendly
-        title = article.title[:20].replace(' ', '_')
+  
         # format date like '2023-02-22'
-        date = f"{article.publish_date}"
-        date = date.split(' ')[0]
+        date = f"{article.publish_date}"        
         data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title}
-        outfile = f"{ticker}_{date}_{parser}_{title}.json"
         
-        with open(outfile, 'w') as f:            
-            json.dump(data, f, indent=4)
-            
-        print(f"Wrote file '{outfile}'")
+        repository.persist(data)
         
         time.sleep(3)
         
