@@ -1,6 +1,7 @@
 
 
 
+import datetime
 import time
 from typing import List
 
@@ -14,9 +15,14 @@ def validate_article_date(art: newspaper.Article, valid_date: str):
         return True
     if art.publish_date is None:
         raise ValueError("Article publish_date is None")
-    date = f"{art.publish_date}"
-    date = date.split(' ')[0]
-    if date != valid_date:
+    #date = f"{art.publish_date}"
+
+    publish_date = art.publish_date.date()
+    valid_date = datetime.strptime(valid_date, "%Y-%m-%d").date()
+
+    start_date = valid_date - datetime.timedelta(days=1)
+    end_date = valid_date + datetime.timedelta(days=1)
+    if not start_date <= publish_date <= end_date:
         raise ValueError(f"Article publish_date {art.publish_date} does not match valid_date {valid_date}")
     
 
