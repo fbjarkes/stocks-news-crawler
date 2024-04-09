@@ -1,6 +1,8 @@
 import json
 from abc import ABC, abstractmethod
+from typing import Dict
 
+import aiosqlite
 
 class NewsTextRepository(ABC):
     
@@ -24,10 +26,44 @@ class JsonFileRepository(NewsTextRepository):
 
 
 class SqliteRepository(NewsTextRepository):
+ 
     
+    def __init__(self, db_path, table='tickers'):
+        self.db_path = db_path
+        self._conn = None
+        self.table = table
+        
+    async def connect(self):    
+        self._conn = await aiosqlite.connect(self.db_path)
+
+
+    async def __aenter__(self):        
+        await self.connect()
+        return self
+
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):            
+        await self._conn.close()
+
+
     def persist(self, data):        
         # insert data['text'] into News table using data['ticker] as FK from Tickers table
         ...
+        
+    async def get_company_desc(self, symbol):    
+        async with self:
+            cursor = await self._conn.cursor()
+            await cursor.execute(f"SELECT company_desc FROM {self.table} WHERE {symbol} = ?", (symbol))
+            row = await cursor.fetchone()
+            return row[0] if row else ''
+        
+    async def get_company_desc_all(self) -> Dict[str, str]:
+        async with self:
+            cursor = await self._conn.cursor()
+            await cursor.execute(f"SELECT * FROM {self.table}")
+            rows = await cursor.fetchall()        
+            return {row[0]: row[1] for row in rows}
+
         
         
         
