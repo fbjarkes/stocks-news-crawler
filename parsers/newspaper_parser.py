@@ -32,12 +32,7 @@ def validate_article_dates(art: newspaper.Article, valid_dates: List[str]):
     if art.publish_date is None:
         raise ValueError("Article publish_date is None")
     
-    a = art.publish_date
-    b = a.date()
-    d = f"{a}"[:10]
-    print("A", a)
-    print("B", b)    
-    print("D", d)
+    d = f"{art.publish_date.date()}"[:10]    
     if d not in valid_dates:
         raise ValueError(f"Article publish_date {art.publish_date} does not match valid_dates {valid_dates}")
     
@@ -67,28 +62,29 @@ def parse(repository: NewsTextRepository, crawler: str, ticker: str, urls: List[
             continue
         
         date = f"{article.publish_date}"        
-        data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title, 'crawler': crawler} #TODO: model       
+        #data = {'symbol': ticker, 'text': article.text, 'date': f"{date}", 'url': url, 'title': article.title, 'crawler': crawler} #TODO: model       
+        data = ArticleData(symbol=ticker, text=article.text, date=f"{date}", url=url, title=article.title, crawler=crawler)
         
         repository.persist(data)
         
         time.sleep(3)
         
 async def a_parse(crawler: str, ticker: str, url: str, valid_dates: List[str]) -> ArticleData:
-    print(f"Processing URL: {url}")
+    print(f"{ticker}: Processing URL: '{url}'")
     
     try: 
         article = newspaper.article(url)
         validate_article_dates(article, valid_dates)    
         validate_article_text(article)
     except ValueError as e:        
-        print(f"Invalid article: {e} ({url})")
+        print(f"{ticker}: Invalid article: {e} ({url})")
         return None
     except Exception as e:
         #TODO: if 403 then retry with other headers? (https://www.biopharmcatalyst.com/company/AKBA)
-        print(f"Failed to parse URL: {e} ({url})")
+        print(f"{ticker}: Failed to parse URL: {e} ({url})")
         return None
     
     date = f"{article.publish_date}"        
     data = ArticleData(symbol=ticker, text=article.text, date=f"{date}", url=url, title=article.title, crawler=crawler)
-
+    print(f"{ticker}: Successful ArticleData '{data.title}' ({len(data.text)} chars) ({data.date})")
     return data

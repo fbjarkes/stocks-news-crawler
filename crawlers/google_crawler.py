@@ -1,5 +1,6 @@
 import asyncio
 import sys
+
 sys.path.insert(0, '/Users/fbjarkes/git/python/stock-catalyst-news-crawler') # so we can run this file
 
 import json
@@ -9,6 +10,7 @@ import re
 import mechanicalsoup
 
 from parsers import newspaper_parser
+from utils.persistence import JsonFileRepository
 
 async def agoogle_search(query):
     browser = mechanicalsoup.StatefulBrowser()
@@ -35,7 +37,7 @@ async def agoogle_search(query):
     
     return urls
 
-def google_search(query):
+def google_search(query, ticker):
     browser = mechanicalsoup.StatefulBrowser()
     urls = []
     
@@ -50,23 +52,25 @@ def google_search(query):
     browser.submit_selected()
 
     search_results = browser.get_current_page().select('.tF2Cxc')
-    print(f"Found {len(search_results)} results for '{query}'")
+    print(f"{ticker}: found {len(search_results)} results for '{query}'")
     for idx, result in enumerate(search_results, start=1):
         title = result.select_one('.DKV0Md').text
         #TODO: can get summary and date already here? or do fast AI filter on relevance?
         url = result.select_one('a')['href']
-        print(f"Result {idx}: {title} - {url}")
+        print(f"{ticker}: {idx}: {title} - {url}")
         urls.append(url)
     
     return urls
 
 if __name__ == "__main__":
-    query = "BAND Bandwidth Inc 2022-11-02"
+    query = "CLSK 2023-04-11"
     #query = "Nutanix inc (NTNX) 2023-05-25"
     #urls = google_search(query)
     #newspaper_parser.parse('google', 'NTNX', urls, valid_date='2023-05-25')
-
+    json_repo = JsonFileRepository('.')
     urls = asyncio.run(agoogle_search(query))
     for url in urls:
         print(url)
-    
+        
+    newspaper_parser.parse(json_repo, 'google', 'CLSK', urls, valid_date='2023-04-11')
+

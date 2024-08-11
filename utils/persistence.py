@@ -1,13 +1,16 @@
 import json
 from abc import ABC, abstractmethod
 import sqlite3
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import aiofiles
 import aiosqlite
 
 from model import ArticleData
 
+
+def title_abbreviation(title: str) -> str:
+    return title[:20].replace(' ', '_') if title else 'untitled'
 
 class NewsTextRepository(ABC):
     
@@ -25,9 +28,8 @@ class JsonFileRepository(NewsTextRepository):
     def __init__(self, path: str) -> None:
         self.path = path
     
-    def persist(self, data: ArticleData):
-        # abbreviate title, max 20 characters and file system friendly
-        title = data.title[:20].replace(' ', '_')
+    def persist(self, data: ArticleData):    
+        title = title_abbreviation(data.title)
         date = data.date.split(' ')[0]
         outfile = f"{data.symbol}_{date}_{data.crawler}_{title}.json"
         with open(outfile, 'w') as f:
@@ -35,14 +37,21 @@ class JsonFileRepository(NewsTextRepository):
         print(f"Wrote file '{outfile}'")
     
         
-    async def a_persist(self, data: ArticleData):
-        # abbreviate title, max 20 characters and file system friendly
-        title = data.title[:20].replace(' ', '_')
-        date = data.date.split(' ')[0]
-        outfile = f"{data.symbol}_{date}_{data.crawler}_{title}.json"
-        async with aiofiles.open(outfile, 'w') as f:
-            await f.write(json.dumps(data.__dict__, indent=4))
-        print(f"Wrote file '{outfile}'")
+    async def a_persist(self, data: Optional[ArticleData]):
+        if data is None:
+            print("No data provided to persist.")
+            return
+        
+        try:
+            # abbreviate title, max 20 characters and file system friendly
+            title = (data.title[:20].replace(' ', '_') if data.title else 'untitled')
+            date = (data.date.split(' ')[0] if data.date else 'unknown_date')
+            outfile = f"{data.symbol}_{date}_{data.crawler}_{title}.json"
+            async with aiofiles.open(outfile, 'w') as f:
+                await f.write(json.dumps(data.__dict__, indent=4))
+            print(f"Wrote file '{outfile}'")
+        except Exception as e:
+            print(f"Failed to (async) persist data: {e}")
 
 
 # class SqliteRepository(NewsTextRepository):
