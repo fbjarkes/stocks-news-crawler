@@ -11,6 +11,9 @@
 * Unit test with CosineSimilarity on generated response vs. manually OK response (also to quantify quality of response)
 
 ### different types of news fetching
+* Use local LLM with simple web parser on generic site, e.g. finviz.com/msft  - https://github.com/ScrapeGraphAI/Scrapegraph-ai
+    * with prompt 'Find shares outstanding, days to cover etc." instead of hardcoding divs/ids etc.
+* duckduckgo: https://github.com/deedy5/duckduckgo_search
 * Google/other search: only valid for a specific date, including day before (mostly)
 * Benzinga
 * Try Olostep (actual browser?)
